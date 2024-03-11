@@ -2,10 +2,20 @@ const express = require('express');
 const PORT = 3000;
 const { default: mongoose } = require('mongoose');
 const { mongoURI } = require('./config/mongodb-config.js');
-const nodemailer =require ('nodemailer');
-const pug =require ('pug');
+const nodemailer = require('nodemailer');
+const pug = require('pug');
 const { newPasswordTokenCreate } = require('./controllers/authController.js');
+const bodyParser = require('body-parser');
 
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const { ApiError } = require('./middleware/ApiError.js');
+const config = require("./config/config.json");
+
+
+mongoose.connect(mongoURI)
+    .then(() => console.log('Connected!'))
+    .catch(() => console.log('Failed to connect to mongo'));
 
 
 
@@ -21,7 +31,7 @@ const transporter = nodemailer.createTransport({
 
 async function main() {
     // send mail with defined transport object
-    const html = pug.renderFile('./views/password-reset-mail.pug', { title: 'Hey', message: 'Hello there!', restorPasswordLink:`${await newPasswordTokenCreate("john234_doe6@example.com")}`});
+    const html = pug.renderFile('./views/password-reset-mail.pug', { title: 'Hey', message: 'Hello there!', restorPasswordLink: `${newPasswordTokenCreate("john234_doe6@example.com")}` });
 
     // console.log({ html })
 
@@ -39,42 +49,71 @@ async function main() {
 main().catch(console.error)
 const app = express();
 
-
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.json());
 
 app.set('view engine', 'pug');
 
 app.get('/api/auth/pass-reset', function (req, res) {
-  res.render('password-reset-mail', { title: 'Hey', message: 'Hello there!'});
+    res.render('password-reset-mail', { title: 'Hey', message: 'Hello there!' });
+});
+
+/*app.get('/api/auth/new-pass', (req, res) => {
+    fs.readFile('./views/create-pass.html', 'utf8', (err, data) => {
+        if (err) {
+            const error = new ApiError(500, "Invalid file reading");
+            return next(error);
+        } else {
+            data = data.replace("{{token}}", req.token);
+            res.send(data);
+        }
+    });
+});*/
+
+app.post('/api/auth/new-pass', async (req, res, next) => {
+    const newPassword = req.body.password;
+    const token = req.body.token;
+    const userTkn = jwt.verify(token, config.env.JWT_NEW_PASSW_SECRET);
+    const userDb = await UserUtils.findUserByid(userTkn.id);
+    if (!userDb) {
+        return new ApiError(400, "Token format problem.");
+    }
+    const hashedPassword = bcrypt.hashSync(newPassword, 10);
+    try {
+        await UserModel.update({
+            id: user.id,
+            password: hashedPassword,
+        });
+        res.send('password was changed succsessfuly!');
+    } catch (error) {
+        const err = new ApiError(500, "error writing file to db");
+        return next(err);
+    }
 });
 
 const authRoutes = require('./routes/authRoutes.js');
 const { validationRoutes } = require('./validationRoutes.js');
 const { errorHandler } = require('./middleware/errorMiddleware.js');
-const { ApiError } = require('./middleware/ApiError.js');
 const { passport } = require('./middleware/passport-middleware.js');
 //const { sequelize } = require('./config/squelize-config.js');
 const { postRouter } = require('./routes/postRouter.js');
 const { userRouter } = require('./routes/userRouter.js');
+const { UserUtils } = require('./MongoDBModels/User.js');
 
 app.use(passport.initialize());
 app.use('/api/auth', authRoutes);
-app.use('/',userRouter);
+app.use('/', userRouter);
 app.use('/validate', validationRoutes);
-app.use((req, res ,next) => next(new ApiError(404, 'Route not found.')));
+app.use((req, res, next) => next(new ApiError(404, 'Route not found.')));
 
 app.use(errorHandler);
-
-mongoose.connect(mongoURI)
-    .then(() => console.log('Connected!'))
-    .catch(() => console.log('Failed to connect to mongo'));
 
 
 
 // sequelize.sync().then(() => console.log('db is ready'))
 
 app.listen(PORT, () => {
-  console.log(`Сервер запущен по адресу http://localhost:${PORT}`);
+    console.log(`Сервер запущен по адресу http://localhost:${PORT}`);
 });
 

@@ -4,6 +4,7 @@ const config = require("../config/config.json");
 const { ApiError } = require("../middleware/ApiError.js");
 const { UserModel, UserUtils } = require("../MongoDBModels/User.js");
 const { error } = require("../Validation/objValidationSchemas.js");
+const fs = require('fs');
 
 const signup = async (req, res, next) => {
   const user = req.body;
@@ -125,11 +126,11 @@ const newPasswordTokenCreate = async (email) => {
 const newPasswordTokenCheckInt = async (token) => {
   try {
     const userTkn = jwt.verify(token, config.env.JWT_NEW_PASSW_SECRET);
-    const userDb = await UserUtils.findUserByLogin(userTkn.login);
+    const userDb = await UserUtils.findUserByid(userTkn.id);
 
     //console.log([user, userDb, userTkn])
 
-    if (!userDb || userDb.login !== userTkn.login) {
+    if (!userDb) {
       return new ApiError(400, "Token format problem.");
     }
 
@@ -146,12 +147,23 @@ const newPasswordTokenCheckInt = async (token) => {
 const newPasswordTokenCheck = async (req, res, next) => {
   try {
     const token = req.query.token;
-    const userDb = newPasswordTokenCheckInt(token);
-    if (userDb === error) 
+    const user = await newPasswordTokenCheckInt(token);
+    if (user === error)
       next(error);
     else {
-      res.status(201).json({
-        result: "<><><input /><input />${token}</>", // роут на запись дабл пароля в подтверждении ввода
+      fs.readFile('./views/create-pass.html', 'utf8', (err, data) => {
+        if (err) {
+          const error = new ApiError(500, "Invalid file reading");
+          return next(error);
+        } else {
+          const newPasswordToken = jwt.sign(
+            { id: user.id, login: user.login },
+            config.env.JWT_NEW_PASSW_SECRET,
+            { expiresIn: config.env.newPasswordTokenExpiration }
+          );
+          data = data.replace("{{token}}", newPasswordToken);
+          res.send(data);
+        }
       });
     }
   } catch (e) {
@@ -166,7 +178,7 @@ const newPasswordTokenChange = async (req, res, next) => {
     const token = req.body.token;
     const userTkn = jwt.verify(token, config.env.JWT_NEW_PASSW_SECRET);
     const userDb = await UserUtils.findUserByLogin(userTkn.login);
-    if (userDb === error) 
+    if (userDb === error)
       next(error);
     else {
       //Update UserDbPassword with req.body.password
