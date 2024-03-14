@@ -1,43 +1,52 @@
-const { Router }=require('express');
-const { PostModel }= require ("../MongoDBModels/Post.js");
+const { Router } = require('express');
+const { PostModel } = require("../MongoDBModels/Post.js");
 
-const postRouter = new Router()
+const postRouter = new Router();
 
-postRouter.post('/post', async (req, res) => {
 
+/*postRouter.post('/posts', async (req, res) => {
     try {
-        const postData = req.body
-
-        const post = await PostModel.create(postData)
-
-        res.status(201).json({
-            post
-        })
+        const postData = req.body;
+        const post = await PostModel.create(postData);
+        res.status(201).json({ post });
     } catch (e) {
-        res.status(500).json({
-            error: e.message
-        })
+        res.status(500).json({ error: e.message });
     }
+});
 
-})
 
-postRouter.get('/post', async (req, res) => {
-
+postRouter.put('/posts/:id', async (req, res) => {
     try {
-
-        const id = req.query.id;
-
-        const post = await PostModel.findById(id);
-
-        res.status(201).json({
-            post
-        })
+        const postId = req.params.id;
+        const postData = req.body;
+        const post = await PostModel.findByIdAndUpdate(postId, postData, { new: true });
+        res.status(200).json({ post });
     } catch (e) {
-        res.status(500).json({
-            error: e.message
-        })
+        res.status(500).json({ error: e.message });
     }
+});
 
-})
 
-module.exports ={postRouter};
+postRouter.patch('/posts/:id', async (req, res) => {
+    try {
+        const postId = req.params.id;
+        const postData = req.body;
+        const post = await PostModel.findByIdAndUpdate(postId, postData, { new: true });
+        res.status(200).json({ post });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});*/
+
+
+postRouter.get('/posts/:id', async (req, res) => {
+    try {
+        const postId = req.params.id;
+        const post = await PostModel.findById(postId);
+        res.status(200).json({ post });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+module.exports = { postRouter };

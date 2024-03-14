@@ -12,6 +12,5 @@ authRoutes.post('/signin', validator(signinSchema), authController.signin);
 authRoutes.post('/refresh-token', authController.refreshToken);
 
 authRoutes.get('/me', passport.authenticate('jwt', { session: false }), authController.getMe);
-authRoutes.get('/new-pass', authController.newPasswordTokenCheck);
 
 module.exports = authRoutes;

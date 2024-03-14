@@ -2,6 +2,7 @@ const { Strategy, ExtractJwt } = require('passport-jwt');
 //import { jwtConfig } from '../config/jwt-config.js'
 const config = require('../config/config.json');
 const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
 const { UserModel, UserUtils } = require('../MongoDBModels/User.js');
 
 const option = {
@@ -14,8 +15,19 @@ const refreshOption = {
       secretOrKey: config.env.JWT_REFRESH_SECRET,
 }
 
-passport.use(
-      new Strategy(option, async (payload, done) => {
+const resetPasswOption = {
+      jwtFromRequest: (req) => req.body?.token,
+      secretOrKey: config.env.JWT_NEW_PASSW_SECRET
+}
+
+let resetPasswEnterOption = {
+      jwtFromRequest: (req) => req.query?.token,
+      secretOrKey: config.env.JWT_NEW_PASSW_SECRET
+  };
+
+  passport.use(
+      'reset-password-enter',
+      new Strategy(resetPasswEnterOption, async (payload, done) => {
             const { id } = payload
             try {
                   user = await UserModel.findById(id)
@@ -29,6 +41,24 @@ passport.use(
             }
       })
 )
+
+passport.use(
+      'reset-password',
+      new Strategy(resetPasswOption, async (payload, done) => {
+            const { id } = payload
+            try {
+                  user = await UserModel.findById(id)
+                  if (user) {
+                        done(null, user)
+                  } else {
+                        done(null, false)
+                  }
+            } catch (e) {
+                  console.log(e)
+            }
+      })
+)
+
 passport.use(
       new Strategy(refreshOption, async (payload, done) => {
             const { id } = payload
@@ -59,6 +89,32 @@ passport.use(
             }
       })
 )
+/*//////////////////////////////
+passport.use('reset-password', new LocalStrategy(
+      {
+            usernameField: 'email',
+            passwordField: 'password',
+            passReqToCallback: true,
+      },
+      async (req, email, password, done) => {
+            try {
+                  const user = await User.findOne({ email });
+
+                  if (!user) {
+                        return done(null, false, { message: 'No user found with that email address.' });
+                  }
+
+                  user.password = password;
+
+                  await user.save();
+
+                  return done(null, user);
+            } catch (error) {
+                  return done(error);
+            }
+      }
+));*/
+
 
 
 module.exports = { passport }
