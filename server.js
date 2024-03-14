@@ -11,7 +11,6 @@ const { validationRoutes } = require('./validationRoutes.js');
 const { errorHandler } = require('./middleware/errorMiddleware.js');
 const { passport } = require('./middleware/passport-middleware.js');
 const { postRouter } = require('./routes/postRouter.js');
-const { userRouter } = require('./routes/userRouter.js');
 //const { sequelize } = require('./config/squelize-config.js');
 
 mongoose.connect(mongoURI)
@@ -25,7 +24,6 @@ app.use(express.json());
 app.set('view engine', 'pug');
 app.use(passport.initialize());
 app.use('/api/auth', authRoutes);
-app.use('/', userRouter);
 app.use('/', resetPasswordRouter);
 app.use('/validate', validationRoutes);
 app.use(postRouter);

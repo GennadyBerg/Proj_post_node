@@ -13,7 +13,7 @@ const UserModel = mongoose.model('User', UserSchema);
 
 const UserUtils = {
     findUserByLogin: async (login) =>
-        await UserModel.findOne({ login }),
+        await UserModel.findOne({ username: login }),
     findUserByid: async (id) =>
         await UserModel.findById(id),
     findUserByEmail: async (email) =>

@@ -4,6 +4,11 @@ const config = require('../config/config.json');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const { UserModel, UserUtils } = require('../MongoDBModels/User.js');
+const { resetPasswEnterStrategy, resetPasswStrategy } = require('./resetPasswordStrategy.js');
+
+passport.use('reset-password-enter', resetPasswEnterStrategy);  
+passport.use('reset-password', resetPasswStrategy);  
+  
 
 const option = {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -15,36 +20,9 @@ const refreshOption = {
       secretOrKey: config.env.JWT_REFRESH_SECRET,
 }
 
-const resetPasswOption = {
-      jwtFromRequest: (req) => req.body?.token,
-      secretOrKey: config.env.JWT_NEW_PASSW_SECRET
-}
-
-let resetPasswEnterOption = {
-      jwtFromRequest: (req) => req.query?.token,
-      secretOrKey: config.env.JWT_NEW_PASSW_SECRET
-  };
-
-  passport.use(
-      'reset-password-enter',
-      new Strategy(resetPasswEnterOption, async (payload, done) => {
-            const { id } = payload
-            try {
-                  user = await UserModel.findById(id)
-                  if (user) {
-                        done(null, user)
-                  } else {
-                        done(null, false)
-                  }
-            } catch (e) {
-                  console.log(e)
-            }
-      })
-)
-
 passport.use(
-      'reset-password',
-      new Strategy(resetPasswOption, async (payload, done) => {
+      'post-use',
+      new Strategy(option, async (payload, done) => {
             const { id } = payload
             try {
                   user = await UserModel.findById(id)
@@ -58,6 +36,7 @@ passport.use(
             }
       })
 )
+
 
 passport.use(
       new Strategy(refreshOption, async (payload, done) => {
