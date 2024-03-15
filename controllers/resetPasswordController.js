@@ -1,4 +1,3 @@
-
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const fs = require('fs');
@@ -44,8 +43,6 @@ const newPasswordMail = async (req, res, next) => {
 
   const html = pug.renderFile('./views/password-reset-mail.pug', { title: 'Hey', message: 'Hello there!', restorPasswordLink: `${link}` });
 
-  // console.log({ html })
-
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
@@ -57,15 +54,15 @@ const newPasswordMail = async (req, res, next) => {
   });
 
   const info = await transporter.sendMail({
-    from: '', // sender address
-    to: "snack.uventa@gmail.com", // list of receivers
-    subject: "Hello test", // Subject line
-    text: "password : generate new password() ", // plain text body
-    html: html, // html body
+    from: '', 
+    to: "snack.uventa@gmail.com", 
+    subject: "Hello test", 
+    text: "password : generate new password() ", 
+    html: html, 
   });
 
   console.log("Message sent: %s", info.messageId);
-  return res.send('password was changed succsessfuly!');
+  return res.send('Change password link will be sent to the entered email address if it was registered in our system!');
 }
 
 const newPasswordTokenEnter = async (req, res, next) => {
