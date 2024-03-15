@@ -7,8 +7,8 @@ const { passport } = require('../middleware/passport-middleware.js');
 
 
 authRoutes.post('/signup', validator(signupSchema), authController.signup);
-authRoutes.post('/signin', validator(signinSchema), authController.signin);
-authRoutes.post('/refresh-token', authController.refreshToken);
-authRoutes.get('/me', passport.authenticate('jwt', { session: false }), authController.getMe);
+authRoutes.post('/signin', passport.authenticate('sign-in-passw', { session: false }), validator(signinSchema), authController.signin);
+authRoutes.post('/refresh-token', passport.authenticate("refresh-token", { session: false }), authController.refreshToken);
+authRoutes.get('/me', passport.authenticate('sign-in-token', { session: false }), authController.getMe);
 
 module.exports = authRoutes;

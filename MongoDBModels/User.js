@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
-    login: String,
+    username: String,
     password: String,
     email: String,
     role: Number
@@ -12,8 +12,8 @@ const UserSchema = new Schema({
 const UserModel = mongoose.model('User', UserSchema);
 
 const UserUtils = {
-    findUserByLogin: async (login) =>
-        await UserModel.findOne({ username: login }),
+    findUserByUserName: async (username) =>
+        await UserModel.findOne({ username }),
     findUserByid: async (id) =>
         await UserModel.findById(id),
     findUserByEmail: async (email) =>
