@@ -71,4 +71,26 @@ postRouter.get('/posts/:id', async (req, res) => {
     }
 });
 
+/*
+postRouter.get('/users/:id', passport.au, async (req, res) => {
+    try {
+        const postId = req.params.id;
+        const post = await PostModel.findById(postId);
+        res.status(200).json({ post });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+postRouter.get('/users', async (req, res) => {
+    try {
+        const postId = req.params.id;
+        const post = await PostModel.findById(postId);
+        res.status(200).json({ post });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+*/
+
 module.exports = { postRouter };

@@ -1,13 +1,15 @@
-FROM alpine:3.18
-
+FROM node:21
 
 WORKDIR /app
 
-COPY package*.json ./
+EXPOSE 3000
 
+COPY package*.json ./
+ 
 RUN npm install
 
 COPY . .
+
 
 CMD ["npm", "run", "dev"]
 
