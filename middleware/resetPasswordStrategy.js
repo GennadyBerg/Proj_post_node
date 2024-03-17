@@ -7,20 +7,19 @@ let resetPasswEnterOption = {
   secretOrKey: config.env.JWT_NEW_PASSW_SECRET
 };
 
-const resetPasswEnterStrategy =
-  new Strategy(resetPasswEnterOption, async (payload, done) => {
-    const { id } = payload
-    try {
-      user = await UserModel.findById(id)
-      if (user) {
-        done(null, user)
-      } else {
-        done(null, false)
-      }
-    } catch (e) {
-      console.log(e)
+const resetPasswEnterStrategy = new Strategy(resetPasswEnterOption, async (payload, done) => {
+  const { id } = payload
+  try {
+    user = await UserModel.findById(id)
+    if (user) {
+      done(null, user)
+    } else {
+      done(null, false)
     }
-  });
+  } catch (e) {
+    console.log(e)
+  }
+});
 
 const resetPasswOption = {
   jwtFromRequest: (req) => req.body?.token,

@@ -7,20 +7,19 @@ const option = {
       secretOrKey: config.env.JWT_SECRET,
 }
 
-const postUseStrategy =
-      new Strategy(option, async (payload, done) => {
-            const { id } = payload
-            try {
-                  user = await UserModel.findById(id)
-                  if (user) {
-                        done(null, user)
-                  } else {
-                        done(null, false)
-                  }
-            } catch (e) {
-                  console.log(e)
+const postUseStrategy = new Strategy(option, async (payload, done) => {
+      const { id } = payload
+      try {
+            user = await UserModel.findById(id)
+            if (user) {
+                  done(null, user)
+            } else {
+                  done(null, false)
             }
-      });
+      } catch (e) {
+            console.log(e)
+      }
+});
 
 
 module.exports = {

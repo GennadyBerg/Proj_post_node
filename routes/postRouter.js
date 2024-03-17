@@ -29,12 +29,8 @@ postRouter.put('/posts/:id', passport.authenticate('post-use', { session: false 
 
             const tempPost = new PostModel(req.body);
 
-            const postData = {};
-            Object.keys(PostModel.schema.paths).forEach(field => {
-                if (field !== '_id' && field !== '__v') {
-                    postData[field] = tempPost[field];
-                }
-            });
+            const { _id, __v, ...rest } = tempPost._doc;
+            const postData = rest;
             postData.owner_id = req.user._id;
 
             const post = await PostModel.findByIdAndUpdate(postId, postData, { new: true });
@@ -53,8 +49,8 @@ postRouter.patch('/posts/:id', passport.authenticate('post-use', { session: fals
         try {
             const postId = req.params.id;
             const postData = req.body;
-            delete postData.owner_id;
-            const post = await PostModel.findByIdAndUpdate(postId, postData, { new: true });
+            const { owner_id, ...rest } = postData;
+            const post = await PostModel.findByIdAndUpdate(postId, rest, { new: true });
             if (post)
                 return res.status(200).json({ post });
             else
