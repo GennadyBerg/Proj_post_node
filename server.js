@@ -10,6 +10,7 @@ const authRoutes = require('./routes/authRoutes.js');
 const { errorHandler } = require('./middleware/errorMiddleware.js');
 const { passport } = require('./middleware/passport-middleware.js');
 const { postRouter } = require('./routes/postRouter.js');
+const userRoutes = require('./routes/usersRouter.js');
 //const { sequelize } = require('./config/squelize-config.js');
 
 mongoose.connect(mongoURI)
@@ -25,7 +26,7 @@ app.use(passport.initialize());
 app.use('/api/auth', authRoutes);
 app.use('/', resetPasswordRouter);
 // app.use('/validate', validationRoutes);
-app.use(postRouter);
+app.use(postRouter, userRoutes);
 app.use((req, res, next) => next(new ApiError(404, 'Route not found.')));
 app.use(errorHandler);
 // sequelize.sync().then(() => console.log('db is ready'))

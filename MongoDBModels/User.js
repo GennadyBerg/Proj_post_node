@@ -7,6 +7,11 @@ const UserSchema = new Schema({
     password: String,
     email: String,
     role: Number
+    // role: {
+    //     type: Number,
+    //     enum: [0, 1, 2], //0-admin, 1-user, 2 - guest(unregistered) 
+    //     default: 2
+    //   }
 });
 
 const UserModel = mongoose.model('User', UserSchema);
@@ -18,6 +23,8 @@ const UserUtils = {
         await UserModel.findById(id),
     findUserByEmail: async (email) =>
         await UserModel.findOne({ email }),
+    findAllUsers: async()=>
+        await UserModel.findAllUsers()
 }
 
 module.exports = { UserModel, UserUtils };

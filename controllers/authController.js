@@ -66,12 +66,6 @@ const refreshToken = async (req, res, next) => {
   }
 };
 
-const getMe = async (req, res, next) => {
-  const user = req.user;
-  return res
-    .status(200)
-    .json({ id: user._id, username: user.username, email: user.email });
-};
 
 
 
@@ -79,5 +73,6 @@ module.exports = {
   signup,
   signin,
   refreshToken,
-  getMe,
+  // getMe,
+  // getAllUsers,
 };

@@ -8,6 +8,7 @@ passport.use('reset-password', resetPasswStrategy);
 passport.use('sign-in-passw', signinPasswStrategy);
 passport.use('sign-in-token', signInAuthTokenStrategy);
 passport.use('refresh-token', refresAuthTokenStrategy);
+// passport.use('sign-in-token', signInAuthTokenStrategy);
 
 passport.use('post-use', postUseStrategy);
 
