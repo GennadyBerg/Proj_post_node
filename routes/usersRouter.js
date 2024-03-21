@@ -6,7 +6,7 @@ const { extractEntity, userAuth, adminSuperAuth, adminAuth } = require('../middl
 const userRoutes = new Router();
 
 userRoutes.get('/me', passport.authenticate('sign-in-token', { session: false }), extractEntity, userAuth, userController.getMe);
-userRoutes.delete('/users/:id', extractEntity, adminSuperAuth, passport.authenticate('admin-role', { session: false }),  userController.deleteUserById);
-userRoutes.get('/users', extractEntity, adminAuth, passport.authenticate('admin-role', { session: false }), userController.getAllUsers);
+userRoutes.delete('/users/:id', passport.authenticate('sign-in-token', { session: false }), extractEntity, adminSuperAuth, userController.deleteUserById);
+userRoutes.get('/users', passport.authenticate('sign-in-token', { session: false }), adminAuth, userController.getAllUsers);
 
 module.exports = userRoutes;

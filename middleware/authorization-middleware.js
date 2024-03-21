@@ -15,6 +15,7 @@ const { PostModel } = require("../MongoDBModels/Post");
 const { ForbiddenError } = require("./ApiError");
 const { CategoryModel } = require("../MongoDBModels/Category");
 const { CommentModel } = require("../MongoDBModels/Comment");
+const _ = require('lodash');
 
 const RolesEnum = {
       user: 1,
@@ -24,7 +25,7 @@ const RolesEnum = {
 
 const adminSuperAuth = (req, res, next) => {
       const user = req.user;
-      if (user?.role != RolesEnum.superAdmin || user.id === req.entity._id)
+      if (!user || user.role != RolesEnum.superAdmin || user.id === req.entity._id)
             return next(new ForbiddenError());
       return next();
 }
@@ -32,8 +33,15 @@ const adminSuperAuth = (req, res, next) => {
 
 const adminAuth = (req, res, next) => {
       const user = req.user;
-      if (user?.role < RolesEnum.admin)
-            return next(new ForbiddenError());
+      if (!user || user.role < RolesEnum.admin) {
+            const isMe = req.entity?._id == user._id;
+            if (isMe && req.method !== "DELETE") {
+                  req.user = _.omit(user, ['role'])
+                  return next();
+            }
+            else
+                  return next(new ForbiddenError());
+      }
       try {
             checkOwnerAuth(req, user.role);
             return next();
@@ -45,7 +53,7 @@ const adminAuth = (req, res, next) => {
 
 const userAuth = (req, res, next) => {
       const user = req.user;
-      if (user?.role < RolesEnum.user)
+      if (!user || user.role < RolesEnum.user)
             return next(new ForbiddenError());
       try {
             checkOwnerAuth(req);
@@ -59,6 +67,7 @@ const userAuth = (req, res, next) => {
 const checkOwnerAuth = (req) => {
       const user = req.user;
       const entity = req.entity;
+      let res = true;
       if (entity?.owner_id &&
             entity.owner_id !== user._id) {
             if (req.entityType === UserModel.modelName) {
@@ -71,6 +80,7 @@ const checkOwnerAuth = (req) => {
                   throw new ForbiddenError();
             }
       }
+      return res;
 }
 
 const isUserReq = (req) => {
@@ -83,7 +93,7 @@ const isUserEntityReq = (req) => {
 }
 
 const isEntityReq = (req, baseRoute) => {
-      return isPostEntityReq(req, baseRoute) ||
+      return isEntityInstanceReq(req, baseRoute) ||
             req.url.startsWith(`/${baseRoute}`);
 }
 const isEntityInstanceReq = (req, baseRoute) => {
@@ -97,9 +107,9 @@ const extractEntity = async (req, res, next) => {
             if (isUserEntityReq(req))
                   await setEntityInRequest(req, UserModel);
       }
-      else if (isEntityReq(req, "post")) {
+      else if (isEntityReq(req, "posts")) {
             req.entityType = PostModel.modelName;
-            if (isEntityInstanceReq(req, "post"))
+            if (isEntityInstanceReq(req, "posts"))
                   await setEntityInRequest(req, PostModel);
       }
       else if (isEntityReq(req, "category")) {

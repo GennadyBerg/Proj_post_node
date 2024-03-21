@@ -14,9 +14,30 @@ const createFieldsFilter = (req, model) => {
   return query;
 }
 
+const createFieldsSorting = (req, model) => {
+  const sorting = req.query.sortBy;
+  let result = null;
+  if (sorting) {
+    let sortBy = null;
+    const sortFieldsArray = sorting.split(",");
+    for (const sortField of sortFieldsArray) {
+      const sortFieldName = sortField.substring(1);
+      const prop = model.schema.path(sortFieldName);
+      if (prop) {
+        sortBy ??= {}
+        const sortFieldDirection = sortField[0] === '-' ? -1 : 1;
+        sortBy[sortFieldName] = sortFieldDirection;
+      }
+    }
+    if (sortBy)
+      result = { sort: sortBy };
+  }
+  return result;
+}
+
 const getAllEntities = async (req, res, model) => {
   try {
-    const entities = await model.find(createFieldsFilter(req, model));
+    const entities = await model.find(createFieldsFilter(req, model), null, createFieldsSorting(req, model));
     return res.json(entities);
   } catch (error) {
     console.log(error);
@@ -28,7 +49,7 @@ const getEntityIdById = async (req, res, model) => {
   try {
     const entityId = req.params.id;
     const entity = await model.findById(entityId);
-    res.status(200).json({ entity });
+    return res.status(200).json({ [model.modelName.toLowerCase()]: entity });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -39,7 +60,7 @@ const createNewEntity = async (req, res, model, setOwner) => {
     const entity = await model.create(req.body);
     if (setOwner === true)
       entity.owner_id = req.user._id;
-    res.status(201).json({ entity });
+    res.status(201).json({ [model.modelName.toLowerCase()]: entity });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -58,7 +79,7 @@ const putEntityById = async (req, res, model) => {
     const entity = await model.findByIdAndUpdate(entityId, rest, { new: true });
 
     if (entity)
-      return res.status(200).json({ entity });
+      return res.status(200).json({ [model.modelName.toLowerCase()]: entity });
     else
       return res.status(404).send({ message: `${model.modelName} not found.` });
   } catch (e) {
@@ -72,7 +93,7 @@ const patchEntityById = async (req, res, model) => {
     const { owner_id, ...rest } = req.body;
     const entity = await model.findByIdAndUpdate(entityId, rest, { new: true });
     if (entity)
-      return res.status(200).json({ post });
+      return res.status(200).json({ entity });
     else
       return res.status(404).send({ message: `${model.modelName} not found.` });
   } catch (e) {
