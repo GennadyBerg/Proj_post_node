@@ -8,7 +8,7 @@ const os = require('os');
 const postRouter = new Router();
 const upload = multer({ dest: os.tmpdir() });
 
-postRouter.post('/posts', passport.authenticate('sign-in-token', { session: false }), upload.single('file'), extractEntity, userAuth, adminAuth, createNewPost);
+postRouter.post('/posts', passport.authenticate('sign-in-token', { session: false }), upload.single('file'), extractEntity, userAuth,  createNewPost);
 postRouter.put('/posts/:id', passport.authenticate('sign-in-token', { session: false }), extractEntity, userAuth, putPostById);
 postRouter.patch('/posts/:id', passport.authenticate('sign-in-token', { session: false }), extractEntity, userAuth, patchPostById);
 postRouter.delete ('/posts/:id', passport.authenticate('sign-in-token', { session: false }), extractEntity, userAuth, deletePostById);

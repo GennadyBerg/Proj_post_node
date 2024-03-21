@@ -67,20 +67,17 @@ const userAuth = (req, res, next) => {
 const checkOwnerAuth = (req) => {
       const user = req.user;
       const entity = req.entity;
-      let res = true;
       if (entity?.owner_id &&
-            entity.owner_id !== user._id) {
+            entity.owner_id?.toString() !== user._id?.toString()) {
             if (req.entityType === UserModel.modelName) {
                   if ((!(user.role >= RolesEnum.admin) &&
                         user.role !== RolesEnum.superAdmin)) {
                         throw new ForbiddenError();
                   }
             }
-            else if (req.entityType === PostModel.modelName) {
+            else
                   throw new ForbiddenError();
-            }
       }
-      return res;
 }
 
 const isUserReq = (req) => {

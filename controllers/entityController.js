@@ -57,9 +57,9 @@ const getEntityIdById = async (req, res, model) => {
 
 const createNewEntity = async (req, res, model, setOwner) => {
   try {
+    if (model.schema.path("owner_id"))
+      req.body.owner_id = req.user._id;
     const entity = await model.create(req.body);
-    if (setOwner === true)
-      entity.owner_id = req.user._id;
     res.status(201).json({ [model.modelName.toLowerCase()]: entity });
   } catch (e) {
     res.status(500).json({ error: e.message });

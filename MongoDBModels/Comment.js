@@ -6,7 +6,7 @@ const CommentSchema = new Schema({
     title: String,
     body: String,
     date: { type: Date, default: Date.now },
-    owner_id: String,
+    owner_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     post: { type: mongoose.Schema.Types.ObjectId, ref: 'Post' },
 });
 
