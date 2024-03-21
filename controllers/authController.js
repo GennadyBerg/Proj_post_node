@@ -6,13 +6,13 @@ const { UserModel, UserUtils } = require("../MongoDBModels/User.js");
 
 const signup = async (req, res, next) => {
   const user = req.body;
-  console.log("In: " + user);
+  // console.log("In: " + user);
 
   const userDb = await UserUtils.findUserByUserName(user.username);
   if (userDb?.id) return next(new ApiError(400, "User name is already used"));
 
   const hashedPassword = bcrypt.hashSync(user.password, 10);
-  console.log("Out: " + user);
+  // console.log("Out: " + user);
 
   await UserModel.create({
     email: user.email,
@@ -20,9 +20,9 @@ const signup = async (req, res, next) => {
     role: user.role,
     username: user.username
   });
-  console.log("Saved: " + user);
+  // console.log("Saved: " + user);
 
-  return res.status(201).json({ message: "Registration successful" });
+  return res.status(201).json({ message: "Registration successful", user });
 };
 
 const signin = async (req, res, next) => {
@@ -55,7 +55,7 @@ const refreshToken = async (req, res, next) => {
       { expiresIn: config.env.tokenExpiration }
     );
 
-    console.log(accessToken);
+    // console.log(accessToken);
 
     return res.status(200).json({ accessToken });
   } catch (error) {
@@ -66,13 +66,4 @@ const refreshToken = async (req, res, next) => {
   }
 };
 
-
-
-
-module.exports = {
-  signup,
-  signin,
-  refreshToken,
-  // getMe,
-  // getAllUsers,
-};
+module.exports = { signup, signin, refreshToken };
