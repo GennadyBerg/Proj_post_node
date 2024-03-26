@@ -1,13 +1,14 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const config = require("../config/config.json");
+const config = require("../config/config.js");
 const { ApiError } = require("../middleware/ApiError.js");
 const { UserModel, UserUtils } = require("../MongoDBModels/User.js");
+const { RolesEnum } = require("../middleware/authorization-middleware.js");
 
 const signup = async (req, res, next) => {
   const user = req.body;
   // console.log("In: " + user);
-
+  user.role = RolesEnum.user;
   const userDb = await UserUtils.findUserByUserName(user.username);
   if (userDb?.id) return next(new ApiError(400, "User name is already used"));
 
@@ -30,13 +31,13 @@ const signin = async (req, res, next) => {
 
   const accessToken = jwt.sign(
     { id: user._id, username: user.username },
-    config.env.JWT_SECRET,
-    { expiresIn: config.env.tokenExpiration }
+    config.env.jwt.JWT_SECRET,
+    { expiresIn: config.env.jwt.tokenExpiration }
   );
 
   const refreshToken = jwt.sign(
     { id: user._id, username: user.username },
-    config.env.JWT_REFRESH_SECRET
+    config.env.jwt.JWT_REFRESH_SECRET
   );
 
   return res
@@ -51,8 +52,8 @@ const refreshToken = async (req, res, next) => {
 
     const accessToken = jwt.sign(
       { id: user._id, username: user.username },
-      config.env.JWT_SECRET,
-      { expiresIn: config.env.tokenExpiration }
+      config.env.jwt.JWT_SECRET,
+      { expiresIn: config.env.jwt.tokenExpiration }
     );
 
     // console.log(accessToken);

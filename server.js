@@ -1,3 +1,5 @@
+const dotenv = require('dotenv');
+dotenv.config();
 const express = require('express');
 const { default: mongoose } = require('mongoose');
 const { mongoURI } = require('./config/mongodb-config.js');
@@ -5,7 +7,6 @@ const bodyParser = require('body-parser');
 const { ApiError } = require('./middleware/ApiError.js');
 const resetPasswordRouter = require('./routes/resetPasswordRouter.js');
 const authRoutes = require('./routes/authRoutes.js');
-// const { validationRoutes } = require('./validationRoutes.js');
 const { errorHandler } = require('./middleware/errorMiddleware.js');
 const { passport } = require('./middleware/passport-middleware.js');
 const { postRouter } = require('./routes/postRouter.js');
@@ -13,8 +14,11 @@ const userRoutes = require('./routes/usersRouter.js');
 const { categoryRoutes } = require('./routes/categoryRouter.js');
 const { commentRouter } = require('./routes/commentRouter.js');
 const { uploadRouter } = require('./routes/uploadRouter.js');
+const config = require('./config/config.js');
 //const { sequelize } = require('./config/squelize-config.js');
-const PORT = 3000;
+
+
+const PORT = config.env.launch.port;
 
 mongoose.connect(mongoURI)
     .then(() => console.log('Connected!'))

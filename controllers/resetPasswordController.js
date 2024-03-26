@@ -1,12 +1,12 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const fs = require('fs');
-const nodemailer = require('nodemailer');
 const pug = require('pug');
 const { UserModel } = require('../MongoDBModels/User');
-const config = require("../config/config.json");
+const config = require("../config/config.js");
 const { ApiError } = require("../middleware/ApiError.js");
 const { error } = require("../Validation/objValidationSchemas.js");
+const mailer = require("../mailers/mailer.js");
 
 const newPasswordInit = async (req, res, next) => {
   try {
@@ -35,33 +35,16 @@ const newPasswordMail = async (req, res, next) => {
 
   const newPasswordToken = jwt.sign(
     { id: user._id, username: user.username },
-    config.env.JWT_NEW_PASSW_SECRET,
-    { expiresIn: config.env.newPasswordTokenExpiration }
+    config.env.jwt.JWT_NEW_PASSW_SECRET,
+    { expiresIn: config.env.jwt.newPasswordTokenExpiration }
   );
 
   const link = `http://localhost:3000/reset-password?token=${newPasswordToken}`;
 
   const html = pug.renderFile('./views/password-reset-mail.pug', { title: 'Hey', message: 'Hello there!', restorPasswordLink: `${link}` });
 
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: "gennady.berg@gmail.com",
-      pass: "lnprcjcxddnrqajs",
-    },
-  });
+  await mailer.sendMail(user.email, "Hello test", "password : generate new password()", html);
 
-  const info = await transporter.sendMail({
-    from: '', 
-    to: "snack.uventa@gmail.com", 
-    subject: "Hello test", 
-    text: "password : generate new password() ", 
-    html: html, 
-  });
-
-  console.log("Message sent: %s", info.messageId);
   return res.send('Change password link will be sent to the entered email address if it was registered in our system!');
 }
 
@@ -78,8 +61,8 @@ const newPasswordTokenEnter = async (req, res, next) => {
         } else {
           const newPasswordToken = jwt.sign(
             { id: user.id, login: user.login },
-            config.env.JWT_NEW_PASSW_SECRET,
-            { expiresIn: config.env.newPasswordTokenExpiration }
+            config.env.jwt.JWT_NEW_PASSW_SECRET,
+            { expiresIn: config.env.jwt.newPasswordTokenExpiration }
           );
           data = data.replace("{{token}}", newPasswordToken);
           res.send(data);

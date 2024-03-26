@@ -9,7 +9,7 @@ const UserSchema = new Schema({
     // role: Number
     role: {
         type: Number,
-        enum: [1, 2], //1-admin, 2-user
+        enum: [1, 2, 3], //1-admin, 2-user
         default: 2
       }
 });

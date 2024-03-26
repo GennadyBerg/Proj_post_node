@@ -138,4 +138,4 @@ const setEntityInRequest = async (req, model) => {
       }
 }
 
-module.exports = { adminSuperAuth, adminAuth, userAuth, extractEntity };
+module.exports = { adminSuperAuth, adminAuth, userAuth, extractEntity, RolesEnum };
