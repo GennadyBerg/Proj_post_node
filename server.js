@@ -1,5 +1,4 @@
 const express = require('express');
-const PORT = 3000;
 const { default: mongoose } = require('mongoose');
 const { mongoURI } = require('./config/mongodb-config.js');
 const bodyParser = require('body-parser');
@@ -13,7 +12,9 @@ const { postRouter } = require('./routes/postRouter.js');
 const userRoutes = require('./routes/usersRouter.js');
 const { categoryRoutes } = require('./routes/categoryRouter.js');
 const { commentRouter } = require('./routes/commentRouter.js');
+const { uploadRouter } = require('./routes/uploadRouter.js');
 //const { sequelize } = require('./config/squelize-config.js');
+const PORT = 3000;
 
 mongoose.connect(mongoURI)
     .then(() => console.log('Connected!'))
@@ -28,7 +29,7 @@ app.use(passport.initialize());
 app.use('/api/auth', authRoutes);
 app.use('/', resetPasswordRouter);
 // app.use('/validate', validationRoutes);
-app.use(postRouter, userRoutes, categoryRoutes, commentRouter);
+app.use(postRouter, userRoutes, categoryRoutes, commentRouter, uploadRouter);
 app.use((req, res, next) => next(new ApiError(404, 'Route not found.')));
 app.use(errorHandler);
 // sequelize.sync().then(() => console.log('db is ready'))

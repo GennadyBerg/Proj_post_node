@@ -28,6 +28,11 @@ const fileFilter = (req, file, cb) => {
 // Middleware для загрузки файла с помощью multer
 const imageUploader = multer({ storage: storage, fileFilter: fileFilter });
 
-imageUploader.getImage = async (req) => req.files?.find((f) => f.fieldname === "image");
+imageUploader.getImage = (req) => req.files?.find((f) => f.fieldname === "image");
+imageUploader.getImageFileName = (req) => {
+  const imageFile = imageUploader.getImage(req);
+  const res = imageFile ? `${imageFile.destination}${imageFile.filename}` : null;
+  return res;
+}
 
 module.exports = { imageUploader };

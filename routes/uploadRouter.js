@@ -8,13 +8,12 @@ uploadRouter.post(
   "/upload",
   passport.authenticate("sign-in-token", { session: false }),
   imageUploader.any(),
-  async (res, req) => {
-    const file = imageUploader.getImage(req);
-    if (!file) {
+  async (req, res) => {
+    const fileName = imageUploader.getImageFileName(req);
+    if (!fileName) {
       return res.status(400).send("No file uploaded.");
     }
-    // Если файл загружен успешно, возвращаем имя загруженного файла
-    res.send(file.filename);
+        res.status(200).json({ fileName });
   }
 );
 

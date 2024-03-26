@@ -75,8 +75,10 @@ const checkOwnerAuth = (req) => {
                         throw new ForbiddenError();
                   }
             }
-            else
-                  throw new ForbiddenError();
+            else {
+                  if (user.role < RolesEnum.superAdmin)
+                        throw new ForbiddenError();
+            }
       }
 }
 

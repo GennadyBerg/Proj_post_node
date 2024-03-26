@@ -7,7 +7,12 @@ const createFieldsFilter = (req, model) => {
     const prop = model.schema.path(filterFieldName);
     if (prop) {
       let value = req.query[filterFieldName];
-      if (prop.instance === "Array") value = { $all: value.split(",") };
+      if (prop.instance === "Array") {
+        value = { $all: value.split(",") };
+      }
+      else if (value.includes(",")) {
+        value = { $in: value.split(",") };
+      }
       mqh.getQueryParam(filterFieldName, value, query);
     }
   }
@@ -60,9 +65,9 @@ const getEntityIdById = async (req, res, model) => {
 
 const treatImage = (req, model, entity) => {
   if (model.schema.path("image")) {
-    const imageFile = imageUploader.getImage(req);
-    if (imageFile) 
-        entity.image = imageFile.fileName;
+    const imageFileName = imageUploader.getImageFileName(req);
+    if (imageFileName) 
+        entity.image = imageFileName;
   }
 };
 
