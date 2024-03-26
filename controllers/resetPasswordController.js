@@ -84,8 +84,10 @@ const newPasswordTokenSave = async (req, res, next) => {
       user = await UserModel.findByIdAndUpdate(user._id, { password: hashedPassword }, { new: true });
       if (!user)
         return res.status(404).send({ message: 'User not found' });
-      else
+      else{
+        await mailer.sendMail(user.email, `Hello ${user.username}, "password : new password saved succsesfully`);
         return res.send('password was changed succsessfuly!');
+      }
     } catch (error) {
       const err = new ApiError(500, "error at  password restore.");
       return next(err);
