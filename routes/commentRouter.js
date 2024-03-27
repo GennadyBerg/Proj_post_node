@@ -6,7 +6,7 @@ const { userAuth, extractEntity } = require('../middleware/authorization-middlew
 const commentRouter = new Router();
 
 commentRouter.post('/comment', passport.authenticate('sign-in-token', { session: false }), extractEntity, userAuth, createNewComment);
-commentRouter.put('/commentspost/:id', passport.authenticate('sign-in-token', { session: false }), extractEntity, userAuth, putCommentById);
+commentRouter.put('/comment/:id', passport.authenticate('sign-in-token', { session: false }), extractEntity, userAuth, putCommentById);
 commentRouter.delete ('/comment/:id', passport.authenticate('sign-in-token', { session: false }), extractEntity, userAuth, deleteCommentById);
 commentRouter.patch('/comment/:id', passport.authenticate('sign-in-token', { session: false }), extractEntity, userAuth, patchCommentById);
 

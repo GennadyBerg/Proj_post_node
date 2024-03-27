@@ -1,5 +1,6 @@
 const { imageUploader } = require("./imageUploader.js");
 const mqh = require("./mongoQueryHelper.js");
+const _ = require('lodash');
 
 const createFieldsFilter = (req, model) => {
   const query = {};
@@ -9,8 +10,7 @@ const createFieldsFilter = (req, model) => {
       let value = req.query[filterFieldName];
       if (prop.instance === "Array") {
         value = { $all: value.split(",") };
-      }
-      else if (value.includes(",")) {
+      } else if (value.includes(",")) {
         value = { $in: value.split(",") };
       }
       mqh.getQueryParam(filterFieldName, value, query);
@@ -66,12 +66,11 @@ const getEntityIdById = async (req, res, model) => {
 const treatImage = (req, model, entity) => {
   if (model.schema.path("image")) {
     const imageFileName = imageUploader.getImageFileName(req);
-    if (imageFileName) 
-        entity.image = imageFileName;
+    if (imageFileName) entity.image = imageFileName;
   }
 };
 
-const createNewEntity = async (req, res, model, setOwner) => {
+const createNewEntity = async (req, res, model) => {
   try {
     if (model.schema.path("owner_id")) req.body.owner_id = req.user._id;
     treatImage(req, model, req.body);
@@ -82,16 +81,23 @@ const createNewEntity = async (req, res, model, setOwner) => {
   }
 };
 
-const putEntityById = async (req, res, model) => {
+const omitFieldChange = (obj, fieldNames) => {
+  let res = obj;
+  if (fieldNames?.length > 0) res = _.omit(obj, fieldNames);
+  return res;
+};
+
+const putEntityById = async (req, res, model, omitFields) => {
   try {
     const entityId = req.params.id;
 
     let entityToUpdate = await model.findById(entityId).exec();
     if (!entityToUpdate)
       return res.status(404).send({ message: `${model.modelName} not found.` });
+    entityToUpdate = omitFieldChange(entityToUpdate, omitFields);
 
     const tempEntity = new model(req.body);
-    const { _id, __v, ...rest } = tempEntity._doc;
+    let { _id, __v, ...rest } = tempEntity._doc;
     treatImage(req, model, rest);
     const entity = await model.findByIdAndUpdate(entityId, rest, { new: true });
 
@@ -104,10 +110,11 @@ const putEntityById = async (req, res, model) => {
   }
 };
 
-const patchEntityById = async (req, res, model) => {
+const patchEntityById = async (req, res, model, omitFields) => {
   try {
     const entityId = req.params.id;
-    const { owner_id, ...rest } = req.body;
+    let { owner_id, ...rest } = req.body;
+    rest = omitFieldChange(rest, omitFields);
     treatImage(req, model, rest);
     const entity = await model.findByIdAndUpdate(entityId, rest, { new: true });
     if (entity) return res.status(200).json({ entity });
