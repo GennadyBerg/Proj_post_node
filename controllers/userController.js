@@ -1,22 +1,9 @@
 const { UserModel } = require("../MongoDBModels/User.js");
 const { default: mongoose } = require('mongoose');
 const { UserSchema } = require("../Validation/authValidationSchemas.js");
+const entityController = require("./entityController.js");
 
-
-
-const User = mongoose.model('User', UserSchema);
-
-const getAllUsers = async (req, res) => {
-  try {
-    const users = await User.find();
-    res.json(users)
-    return users;
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error fetching users' });
-
-  }
-}
+const getAllUsers = async (req, res) => await entityController.getAllEntities(req, res, UserModel);
 
 const getMe = async (req, res) => {
   const user = req.user;

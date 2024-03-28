@@ -1,10 +1,10 @@
 const { Strategy } = require('passport-jwt');
-const config = require('../config/config.json');
+const config = require('../config/config.js');
 const { UserModel } = require('../MongoDBModels/User');
 
 let resetPasswEnterOption = {
   jwtFromRequest: (req) => req.query?.token,
-  secretOrKey: config.env.JWT_NEW_PASSW_SECRET
+  secretOrKey: config.env.jwt.JWT_NEW_PASSW_SECRET
 };
 
 const resetPasswEnterStrategy = new Strategy(resetPasswEnterOption, async (payload, done) => {
@@ -23,7 +23,7 @@ const resetPasswEnterStrategy = new Strategy(resetPasswEnterOption, async (paylo
 
 const resetPasswOption = {
   jwtFromRequest: (req) => req.body?.token,
-  secretOrKey: config.env.JWT_NEW_PASSW_SECRET
+  secretOrKey: config.env.jwt.JWT_NEW_PASSW_SECRET
 }
 
 const resetPasswStrategy =

@@ -6,12 +6,11 @@ const UserSchema = new Schema({
     username: String,
     password: String,
     email: String,
-    role: Number
-    // role: {
-    //     type: Number,
-    //     enum: [0, 1, 2], //0-admin, 1-user, 2 - guest(unregistered) 
-    //     default: 2
-    //   }
+    role: {
+        type: Number,
+        enum: [1, 2, 3], //1-admin, 2-user
+        default: 2
+      }
 });
 
 const UserModel = mongoose.model('User', UserSchema);

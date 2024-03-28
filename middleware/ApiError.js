@@ -6,5 +6,13 @@ class ApiError extends Error {
       }
     }
 
-module.exports = { ApiError };
+    class ForbiddenError extends ApiError {
+      constructor() {
+        super();
+        this.statusCode = 401;
+        this.message = "Forbidden";
+      }
+    }
+
+module.exports = { ApiError, ForbiddenError };
     
