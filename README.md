@@ -2,14 +2,9 @@
 hw9
 
 npm run dev
-post   /signin      
-      {
-            "login": "Gena_5",
-            "password": "b9a1527cdc938b6fdc56"
-      }
+http://localhost:3000/reset-password-init
 
-      net access  - anyIp allowwed
-
+https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox
 
 
 

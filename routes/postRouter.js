@@ -11,7 +11,6 @@ postRouter.put('/posts/:id', passport.authenticate('sign-in-token', { session: f
 postRouter.patch('/posts/:id', passport.authenticate('sign-in-token', { session: false }), extractEntity, userAuth, imageUploader.any(), patchPostById);
 postRouter.delete ('/posts/:id', passport.authenticate('sign-in-token', { session: false }), extractEntity, userAuth, deletePostById);
 
-
 postRouter.get('/posts/:id', getPostById);
 postRouter.get('/posts',getAllPosts);
 

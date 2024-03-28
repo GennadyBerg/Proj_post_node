@@ -3,8 +3,6 @@ const { default: mongoose } = require('mongoose');
 const { UserSchema } = require("../Validation/authValidationSchemas.js");
 const entityController = require("./entityController.js");
 
-
-
 const getAllUsers = async (req, res) => await entityController.getAllEntities(req, res, UserModel);
 
 const getMe = async (req, res) => {

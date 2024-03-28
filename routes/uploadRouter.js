@@ -17,5 +17,4 @@ uploadRouter.post(
   }
 );
 
-
 module.exports = { uploadRouter };
